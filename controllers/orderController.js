@@ -11,46 +11,46 @@ const razorpayInstance = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 // Create new Order
-// exports.newOrder = catchAsyncErrors(async (req, res, next) => {
-//   const {
-//     shippingInfo,
-//     orderItems,
-//     paymentInfo,
-//     itemsPrice,
-//     taxPrice,
-//     shippingPrice,
-//     totalPrice,
-//   } = req.body;
+exports.newOrder = catchAsyncErrors(async (req, res, next) => {
+  const {
+    shippingInfo,
+    orderItems,
+    paymentInfo,
+    itemsPrice,
+    taxPrice,
+    shippingPrice,
+    totalPrice,
+  } = req.body;
 
-//   // const productIds = orderItems.map((order) => order.product);
-//   // let venders = []
+  // const productIds = orderItems.map((order) => order.product);
+  // let venders = []
 
-//   // for (let i = 0; productIds.length > 0; i++) {
-//   //   const product = await Product.findById(productIds[i]);
-//   //   const vender = await Vender.aggregate([
-//   //     { $match: { _id: product.user } },
-//   //     { $project: { _id: 1 } },
-//   //   ]);
+  // for (let i = 0; productIds.length > 0; i++) {
+  //   const product = await Product.findById(productIds[i]);
+  //   const vender = await Vender.aggregate([
+  //     { $match: { _id: product.user } },
+  //     { $project: { _id: 1 } },
+  //   ]);
 
-//   // }
+  // }
 
-//   const order = await Order.create({
-//     shippingInfo,
-//     orderItems,
-//     paymentInfo,
-//     itemsPrice,
-//     taxPrice,
-//     shippingPrice,
-//     totalPrice,
-//     paidAt: Date.now(),
-//     user: req.user._id,
-//   });
+  const order = await Order.create({
+    shippingInfo,
+    orderItems,
+    paymentInfo,
+    itemsPrice,
+    taxPrice,
+    shippingPrice,
+    totalPrice,
+    paidAt: Date.now(),
+    user: req.user._id,
+  });
 
-//   res.status(201).json({
-//     success: true,
-//     order,
-//   });
-// });
+  res.status(201).json({
+    success: true,
+    order,
+  });
+});
 
 // // get Single Order
 exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
@@ -156,19 +156,19 @@ async function updateStock(id, quantity) {
 }
 
 // // delete Order -- Admin
-// exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
-//   const order = await Order.findById(req.params.id);
+exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
 
-//   if (!order) {
-//     return next(new ErrorHander("Order not found with this Id", 404));
-//   }
+  if (!order) {
+    return next(new ErrorHander("Order not found with this Id", 404));
+  }
 
-//   await order.remove();
+  await order.remove();
 
-//   res.status(200).json({
-//     success: true,
-//   });
-// });
+  res.status(200).json({
+    success: true,
+  });
+});
 
 exports.checkout = async (req, res, next) => {
   try {
