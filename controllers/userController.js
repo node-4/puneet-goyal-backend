@@ -44,7 +44,7 @@ exports.signInWithGoogle = catchAsyncErrors(async (req, res, next) => {
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const { name, phone, password, role } = req.body;
   const user1 = await User.findOne({ phone: phone, role: role });
-  if (!user1) {
+  if (user1) {
       return next(new ErrorHander("Already exits!", 409));
   }
   const user = await User.create({ name, phone, password, role });
