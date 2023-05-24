@@ -31,9 +31,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 app.get("/getImages/:image", (req, res) => {
   res.sendFile(__dirname + `/uploads/${req.params.image}`);
 });
-app.get("/url",(req,res) =>{
-  res.send("hello api is workinf fine")
-})
+
 // Route Imports
 const product = require("./routes/productRoute");
 const user = require("./routes/userRoute");
@@ -44,6 +42,13 @@ const address = require("./routes/addressRoute");
 const vender = require("./routes/venderRoute");
 const coupon = require("./routes/couponRoute");
 const cart = require("./routes/cartRoutes");
+const terms = require('./routes/terms');
+const policy = require('./routes/policy');
+const notify = require('./routes/notification');
+const help = require('./routes/helpandsupport');
+const cat = require('./routes/pantangli')
+const wallet = require('./routes/wallet');
+const banner = require('./routes/banner')
 
 app.use("/api/v1", product);
 app.use("/api/v1", user);
@@ -54,6 +59,14 @@ app.use("/api/v1", address);
 app.use("/api/v1/vender", vender);
 app.use("/api/v1/coupon", coupon);
 app.use("/api/v1/cart", cart);
+app.use('/api/v1/terms', terms);
+app.use('/api/v1/notify', notify);
+app.use('/api/v1/privacy', policy);
+app.use('/api/v1/help',help )
+app.use('/api/v1/wallet', wallet);
+app.use('/api/v1/non-pantangli', cat);
+app.use('/api/v1/banner', banner);
+app.use('/api/v1/terms', terms);
 
 app.use(errorMiddleware);
 

@@ -1,11 +1,14 @@
 const Cart = require("../models/cartModel");
 const Coupon = require("../models/couponModel");
+const Product = require('../models/productModel')
 const ErrorHander = require("../utils/errorhander");
 const moment = require("moment")
 
 exports.addToCart = async (req, res, next) => {
   try {
     const  product  = req.params.id;
+    const productData = await Product.findById({_id: product})
+    console.log(productData)
     let cart = await Cart.findOne({
       user: req.user._id,
     });
@@ -13,13 +16,14 @@ exports.addToCart = async (req, res, next) => {
     if (!cart) {
       cart = await createCart(req.user._id);
     }
-
+    const productName = productData.name
+    const price = productData.price
     const productIndex = cart.products.findIndex((cartProduct) => {
       return cartProduct.product.toString() == product;
     });
 
     if (productIndex < 0) {
-      cart.products.push({ product });
+      cart.products.push({ product, productName , price});
     } else {
       cart.products[productIndex].quantity++;
     }

@@ -10,21 +10,37 @@ const { multipleFileHandle } = require("../utils/fileHandle");
 
 // Create Product -- Admin
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
-  const imagesLinks = await multipleFileHandle(req.files,req);
+  try{
+ // const imagesLinks = await multipleFileHandle(req.files,req);
 
-  req.body.images = imagesLinks;
+  // req.body.images = imagesLinks;
   req.body.user = req.user.id;
-
-  const product = await Product.create(req.body);
+  const data = {
+    user:  req.user.id,
+    name: req.body.name,
+    description: req.body.description,
+    price: req.body.price,
+    images: req.body.images,
+    category: req.body.category,
+    Stock: req.body.Stock
+  }
+  const product = await Product.create(data);
 
   res.status(201).json({
     success: true,
     product,
   });
+}catch(err){
+  console.log(err)
+  res.status(400).json({
+    message: err.message
+  })
+}
 });
 
 // Get All Product
 exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
+  try{
   const resultPerPage = 50;
   const productsCount = await Product.countDocuments();
   let demoProduct = await Product.aggregate([
@@ -72,20 +88,34 @@ exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
     resultPerPage,
     filteredProductsCount,
   });
+}catch(err){
+  console.log(err);
+  res.status(400).json({
+    message: err.message
+  })
+}
 });
 
 // Get All Product (Admin)
 exports.getAdminProducts = catchAsyncErrors(async (req, res, next) => {
+  try{
   const products = await Product.find().populate("category");
 
   res.status(200).json({
     success: true,
     products,
   });
+}catch(err){
+  console.log(err);
+  res.status(400).json({
+    message: err.message
+  })
+}
 });
 
 // Get Product Details
 exports.getProductDetails = catchAsyncErrors(async (req, res, next) => {
+  try{
   const product = await Product.findById(req.params.id);
 
   if (!product) {
@@ -96,11 +126,18 @@ exports.getProductDetails = catchAsyncErrors(async (req, res, next) => {
     success: true,
     product,
   });
+}catch(err){
+  console.log(err);
+  res.status(400).json({
+    message: err.message
+  })
+}
 });
 
 // Update Product -- Admin
 
 exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
+  try{
   let product = await Product.findById(req.params.id);
 
   if (!product) {
@@ -108,37 +145,43 @@ exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
   }
 
   // Images Start Here
+  console.log(req.body.images)
   let images = [];
 
-  if (typeof req.body.images === "string") {
+  if (req.body.images) {
     images.push(req.body.images);
   } else {
     images = req.body.images;
   }
 
-  if (images !== undefined) {
-    // Deleting Images From Cloudinary
-    for (let i = 0; i < product.images.length; i++) {
-      await cloudinary.v2.uploader.destroy(product.images[i].public_id);
-    }
+  // if (images !== undefined) {
+  //   // Deleting Images From Cloudinary
+  //   for (let i = 0; i < product.images.length; i++) {
+  //     await cloudinary.v2.uploader.destroy(product.images[i].public_id);
+  //   }
 
-    const imagesLinks = [];
+  //   const imagesLinks = [];
 
-    for (let i = 0; i < images.length; i++) {
-      const result = await cloudinary.v2.uploader.upload(images[i], {
-        folder: "products",
-      });
+  //   for (let i = 0; i < images.length; i++) {
+  //     const result = await cloudinary.v2.uploader.upload(images[i], {
+  //       folder: "products",
+  //     });
 
-      imagesLinks.push({
-        public_id: result.public_id,
-        url: result.secure_url,
-      });
-    }
+  //     imagesLinks.push({
+  //       public_id: result.public_id,
+  //       url: result.secure_url,
+  //     });
+  //   }
 
-    req.body.images = imagesLinks;
-  }
+  //   req.body.images = imagesLinks;
+  // }
 
-  product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+  product = await Product.findByIdAndUpdate(req.params.id, {
+    name: req.body.name,
+    description: req.body.description,
+    price: req.body.price,
+    category: req.body.category
+  }, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
@@ -148,6 +191,12 @@ exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
     success: true,
     product,
   });
+}catch(err){
+  console.log(err);
+  res.status(400).json({
+    message: err.message
+  })
+}
 });
 
 // Delete Product
@@ -159,10 +208,10 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHander("Product not found", 404));
   }
 
-  // Deleting Images From Cloudinary
-  for (let i = 0; i < product.images.length; i++) {
-    await cloudinary.v2.uploader.destroy(product.images[i].public_id);
-  }
+  // // Deleting Images From Cloudinary
+  // for (let i = 0; i < product.images.length; i++) {
+  //   await cloudinary.v2.uploader.destroy(product.images[i].public_id);
+  // }
 
   await product.remove();
 
@@ -339,3 +388,52 @@ exports.getProductByCategory =  catchAsyncErrors(async (req,res,next) => {
     })
   }
 })
+
+
+exports.uploadthroughExcel = async(req,res) => {
+    try{
+        const file = req.file.originalname;
+        console.log(file)
+        const workbook = xlsx.readFile(req.file.originalname);
+        const sheet_name_list = workbook.SheetNames;
+        console.log(sheet_name_list);
+        const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+        console.log(data);
+        for (const product of data) {
+          if(!product.category ){
+            return res.status(401).json({
+              message: "Category Id is Required for Added Product "
+            })
+          }
+          req.body.user = req.user.id;
+          const product = new Product({
+              user:  req.user.id,
+              name: product.name, 
+              description: product.description, 
+              price: product.price, 
+              images: product.images, 
+              category: req.body.category,
+              Stock: req.body.Stock
+          });
+    
+          // Validate employee data
+          const { error } = product.validate(product);
+          if (error) {
+            throw new Error(error.details[0].message);
+          }
+    
+          // Save employee data to MongoDB
+          await product.save();
+       }
+       fs.unlink(file.path, (err) => {
+        if (err) throw err;
+        console.log('Uploaded file deleted');
+      });
+        res.status(200).json({ message: "Product Data is Saved " });
+    }catch(err){
+        console.log(err);
+        res.status(400).json({
+          message: err.message
+        })
+    }
+}

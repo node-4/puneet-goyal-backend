@@ -10,17 +10,7 @@ const subCategorySchema = new mongoose.Schema({
     required: [true, "Parent Category Required"],
     unique:true
   },
-  image: {
-    
-      public_id: {
-        type: String,
-        required: true,
-      },
-      url: {
-        type: String,
-        required: true,
-      },
-    },
-});
+  image: [],
+})
 
 module.exports = mongoose.model("SubCategory", subCategorySchema);

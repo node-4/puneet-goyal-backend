@@ -14,15 +14,16 @@ const {
   deleteUser,
   signInWithGoogle,
   accountVerificationOTP,
-  passwordResetOtp
+  passwordResetOtp,
+  AddUser
 } = require("../controllers/userController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 const { otpLimiter } = require("../middleware/rateLimiter");
 const upload = require("../middleware/fileUpload");
 
 const router = express.Router();
- 
-//  router.route("/sendOTP").post(otpLimiter, sendOTP);
+
+// router.route("/sendOTP").post(otpLimiter, sendOTP);
 
 router.route("/verifyRegistration").post(accountVerificationOTP);
 
@@ -50,13 +51,11 @@ router
   .route("/admin/users")
   .get(isAuthenticatedUser, authorizeRoles("admin"), getAllUser);
 
+router.route("/admin/addUser").post(isAuthenticatedUser, authorizeRoles("admin"), AddUser);
+
 router
   .route("/admin/user/:id")
   .get(isAuthenticatedUser, authorizeRoles("admin"), getSingleUser)
   .put(isAuthenticatedUser, authorizeRoles("admin"), updateUserRole)
-  .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteUser);
-
+  .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteUser)
 module.exports = router;
-
-
-/// checking al the push to git

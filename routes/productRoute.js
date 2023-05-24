@@ -12,7 +12,8 @@ const {
   createWishlist,
   removeFromWishlist,
   myWishlist,
-  getProductByCategory
+  getProductByCategory, 
+  uploadthroughExcel
 } = require("../controllers/productController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 const upload = require("../middleware/fileUpload");
@@ -36,7 +37,6 @@ router
   .post(
     isAuthenticatedUser,
     authorizeRoles("admin"),
-    upload.array("images"),
     createProduct
   );
 
@@ -46,6 +46,7 @@ router
   .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteProduct);
 
 router.route("/product/:id").get(getProductDetails);
+router.route('/uploadExcel' ).post(uploadthroughExcel)
 
 router.route("/review").put(isAuthenticatedUser, createProductReview);
 

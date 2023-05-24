@@ -11,46 +11,46 @@ const razorpayInstance = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 // Create new Order
-exports.newOrder = catchAsyncErrors(async (req, res, next) => {
-  const {
-    shippingInfo,
-    orderItems,
-    paymentInfo,
-    itemsPrice,
-    taxPrice,
-    shippingPrice,
-    totalPrice,
-  } = req.body;
+// exports.newOrder = catchAsyncErrors(async (req, res, next) => {
+//   const {
+//     shippingInfo,
+//     orderItems,
+//     paymentInfo,
+//     itemsPrice,
+//     taxPrice,
+//     shippingPrice,
+//     totalPrice,
+//   } = req.body;
 
-  // const productIds = orderItems.map((order) => order.product);
-  // let venders = []
+//   // const productIds = orderItems.map((order) => order.product);
+//   // let venders = []
 
-  // for (let i = 0; productIds.length > 0; i++) {
-  //   const product = await Product.findById(productIds[i]);
-  //   const vender = await Vender.aggregate([
-  //     { $match: { _id: product.user } },
-  //     { $project: { _id: 1 } },
-  //   ]);
+//   // for (let i = 0; productIds.length > 0; i++) {
+//   //   const product = await Product.findById(productIds[i]);
+//   //   const vender = await Vender.aggregate([
+//   //     { $match: { _id: product.user } },
+//   //     { $project: { _id: 1 } },
+//   //   ]);
 
-  // }
+//   // }
 
-  const order = await Order.create({
-    shippingInfo,
-    orderItems,
-    paymentInfo,
-    itemsPrice,
-    taxPrice,
-    shippingPrice,
-    totalPrice,
-    paidAt: Date.now(),
-    user: req.user._id,
-  });
+//   const order = await Order.create({
+//     shippingInfo,
+//     orderItems,
+//     paymentInfo,
+//     itemsPrice,
+//     taxPrice,
+//     shippingPrice,
+//     totalPrice,
+//     paidAt: Date.now(),
+//     user: req.user._id,
+//   });
 
-  res.status(201).json({
-    success: true,
-    order,
-  });
-});
+//   res.status(201).json({
+//     success: true,
+//     order,
+//   });
+// });
 
 // // get Single Order
 exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
@@ -81,7 +81,7 @@ exports.myOrders = catchAsyncErrors(async (req, res, next) => {
 
 // get all Orders -- Admin
 exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
-  const orders = await Order.find().populate("orderItems.product");
+  const orders = await Order.find().populate({path: 'user', options: {strictPopulate: true}})
 
   let totalAmount = 0;
 
@@ -156,19 +156,19 @@ async function updateStock(id, quantity) {
 }
 
 // // delete Order -- Admin
-exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
-  const order = await Order.findById(req.params.id);
+// exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
+//   const order = await Order.findById(req.params.id);
 
-  if (!order) {
-    return next(new ErrorHander("Order not found with this Id", 404));
-  }
+//   if (!order) {
+//     return next(new ErrorHander("Order not found with this Id", 404));
+//   }
 
-  await order.remove();
+//   await order.remove();
 
-  res.status(200).json({
-    success: true,
-  });
-});
+//   res.status(200).json({
+//     success: true,
+//   });
+// });
 
 exports.checkout = async (req, res, next) => {
   try {
@@ -178,6 +178,7 @@ exports.checkout = async (req, res, next) => {
     });
 
     const { address } = req.body;
+    
 
     const cart = await Cart.findOne({ user: req.user._id })
       .populate({
@@ -192,19 +193,22 @@ exports.checkout = async (req, res, next) => {
     const order = new Order({ user: req.user._id, address });
 
     let grandTotal = 0;
-
+      
     const orderProducts = cart.products.map((cartProduct) => {
       const total = cartProduct.quantity * cartProduct.product.price;
       grandTotal += total;
+    
       return {
         product: cartProduct.product._id,
         unitPrice: cartProduct.product.price,
+        productName: cartProduct.productName,
         quantity: cartProduct.quantity,
         total,
       };
     });
-
+    console.log(orderProducts)
     order.products = orderProducts;
+
 
     if (cart.coupon) {
       order.coupon = cart.coupon._id;
@@ -291,3 +295,18 @@ exports.getOrders = async (req, res, next) => {
     next(error);
   }
 };
+
+
+exports.totalOrders = async(req,res) => {
+  try{
+  const data = await Order.find();
+  res.status(200).json({
+    totalOrders : data.length
+  })
+  }catch(err){
+    console.log(err);
+    res.status(400).json({
+      message: err.message
+    })
+  }
+}
