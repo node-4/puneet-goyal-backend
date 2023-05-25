@@ -365,7 +365,11 @@ exports.createTransactionbyAdmin = async (req, res, next) => {
             Status: req.body.status,
         };
         const data = await transaction.create(obj);
-        return res.status(200).json({ msg: "order id", data: data });
+        if (data) {
+            order.orderStatus = "confirmed";
+            await order.save();
+            return res.status(200).json({ msg: "order id", data: data });
+        }
     } catch (error) {
         next(error);
     }
