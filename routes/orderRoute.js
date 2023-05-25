@@ -24,7 +24,8 @@ router
   .route("/admin/order/:id")
   .put(isAuthenticatedUser, authorizeRoles("admin"), orderController.updateOrder)
 //   .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteOrder);
-router.post("/createTransaction", isAuthenticatedUser, orderController.createTransaction);
+router.post("/createTransaction/:id", isAuthenticatedUser, orderController.createTransaction);
+router.post("/admin/createTransaction/:id", isAuthenticatedUser,authorizeRoles("admin"), orderController.createTransactionbyAdmin);
 router.get("/allTransaction", orderController.allTransaction);
 router.get("/allTransactionUser", isAuthenticatedUser, orderController.allTransactionUser);
 
