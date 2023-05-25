@@ -143,6 +143,10 @@ exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
   if (req.body.status === "Delivered") {
     order.date = Date.now();
   }
+  if (req.body.delivered === true) {
+    order.date = Date.now();
+    order.delivered = req.body.delivered;
+  }
 
   await order.save({ validateBeforeSave: false });
   res.status(200).json({

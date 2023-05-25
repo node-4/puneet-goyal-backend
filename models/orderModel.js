@@ -92,10 +92,6 @@ const orderSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
-        status: {
-            type: String,
-            enum: ["signed","processed","shipped","out_for_delivery","delivered",],
-        },
         date: {
             type: Date,
             default: function () {
