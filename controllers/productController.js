@@ -396,6 +396,7 @@ exports.getProductByCategory = catchAsyncErrors(async (req, res, next) => {
 
 exports.uploadthroughExcel = async (req, res) => {
     try {
+        console.log(req.file);
         const workbook = xlsx.readFile(req.file.path);
         const sheet_name_list = workbook.SheetNames;
         const data = xlsx.utils.sheet_to_json(
@@ -420,9 +421,7 @@ exports.uploadthroughExcel = async (req, res) => {
                 category: findCategory._id,
                 Stock: data[i].Stock,
             });
-            console.log(product);
             let a = await product.save();
-            console.log("----------------",a);
         }
         fs.unlink(req.file.path, (err) => {
             if (err) throw err;
