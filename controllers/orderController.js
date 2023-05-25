@@ -365,7 +365,7 @@ exports.createTransactionbyAdmin = async (req, res, next) => {
 exports.allTransaction = async (req, res) => {
     try {
         const data = await transaction.find().populate("user orderId");
-        res.status(200).json({ totalOrders: data.length });
+        res.status(200).json({ totalOrders: data });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
