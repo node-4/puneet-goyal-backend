@@ -347,6 +347,7 @@ exports.createTransaction = async (req, res, next) => {
 exports.createTransactionbyAdmin = async (req, res, next) => {
   try {
       const order = await Order.findOne({ _id: req.params.id });
+      console.log(order, order.user);
       let obj = {
           user: order.user,
           orderId: order._id,
