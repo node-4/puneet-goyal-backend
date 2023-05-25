@@ -145,46 +145,22 @@ exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
         if (!product) {
             return next(new ErrorHander("Product not found", 404));
         }
-
-        // Images Start Here
-        console.log(req.body.images);
         let images = [];
-
         if (req.body.images) {
             images.push(req.body.images);
         } else {
             images = req.body.images;
         }
-
-        // if (images !== undefined) {
-        //   // Deleting Images From Cloudinary
-        //   for (let i = 0; i < product.images.length; i++) {
-        //     await cloudinary.v2.uploader.destroy(product.images[i].public_id);
-        //   }
-
-        //   const imagesLinks = [];
-
-        //   for (let i = 0; i < images.length; i++) {
-        //     const result = await cloudinary.v2.uploader.upload(images[i], {
-        //       folder: "products",
-        //     });
-
-        //     imagesLinks.push({
-        //       public_id: result.public_id,
-        //       url: result.secure_url,
-        //     });
-        //   }
-
-        //   req.body.images = imagesLinks;
-        // }
-
         product = await Product.findByIdAndUpdate(
             req.params.id,
             {
-                name: req.body.name,
-                description: req.body.description,
-                price: req.body.price,
-                category: req.body.category,
+                name: req.body.name || product.name,
+                description: req.body.description || product.description,
+                price: req.body.price || product.price,
+                category: req.body.category || product.category,
+                images: req.body.images|| product.images,
+                ratings: req.body.ratings|| product.ratings,
+                Stock: req.body.Stock|| product.Stock,
             },
             {
                 new: true,
@@ -409,7 +385,12 @@ exports.uploadthroughExcel = async (req, res) => {
                     name: data[i].category,
                 });
                 if (!findCategory) {
-                    response(res,ErrorCode.NOT_FOUND,{},"Category data not found.");
+                    response(
+                        res,
+                        ErrorCode.NOT_FOUND,
+                        {},
+                        "Category data not found."
+                    );
                 }
             }
             const product = new Product({
