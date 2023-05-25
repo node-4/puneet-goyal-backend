@@ -4,7 +4,8 @@ const {
   getCategories,
   createSubCategory,
   DeleteCategory,
-  TotalCategory
+  TotalCategory,
+  updateCategory
 } = require("../controllers/categoryController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 const upload = require("../middleware/fileUpload");
@@ -18,6 +19,10 @@ router
     );
 
  router.route("/admin/subCategory/new").post(createSubCategory) 
+
+ router
+ .route("/admin/category/:id")
+ .put(isAuthenticatedUser, authorizeRoles("admin"), updateCategory)
 
 router.route("/getAllCategory").get(getCategories);
 

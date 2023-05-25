@@ -40,11 +40,15 @@ exports.updateCategory = catchAsyncErrors(async (req, res, next) => {
     const { id } = req.params;
     const category = await Category.findById(id);
     if (!category) new ErrorHander("Category Not Found !", 400);
-
-    category.parentCategory = req.body.parentCategory;
-    await category.save();
-
-    res.status(200).json({ message: "Updated Successfully" });
+    let product = await Category.findByIdAndUpdate(
+        id,
+        {
+            name: req.body.name || category.name,
+            image: req.body.image|| category.image,
+            type: category.type
+            ,},{new: true,}
+    );
+res.status(200).json({ message: "Updated Successfully" });
 });
 
 exports.removeCategory = catchAsyncErrors(async (req, res, next) => {

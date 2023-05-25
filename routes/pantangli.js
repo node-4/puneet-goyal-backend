@@ -19,6 +19,8 @@ router.route('/admin/subCategory/').post(category.createSubCategory);
 router.route('/getAllNonPanangli').get(category.getCategory)
 
 
+router.route("/admin/category/:id").put(isAuthenticatedUser, authorizeRoles("admin"),category.updateCategory)
+
 router.route('/delete/:id').delete(category.DeleteCategory);
 
 router.route('/total').get(category.TotalPantjaliCategory);

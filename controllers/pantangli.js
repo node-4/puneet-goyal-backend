@@ -42,21 +42,18 @@ exports.getCategory = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.updateCategory = catchAsyncErrors(async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const category = await Category.findById(id);
-        if (!category) new ErrorHander("Category Not Found !", 400);
-
-        category.parentCategory = req.body.parentCategory;
-        await category.save();
-
-        res.status(200).json({ message: "Updated Successfully" });
-    } catch (err) {
-        console.log(err);
-        res.status(200).json({
-            message: err.message,
-        });
-    }
+    const { id } = req.params;
+    const category = await category.findById(id);
+    if (!category) new ErrorHander("Category Not Found !", 400);
+    let product = await category.findByIdAndUpdate(
+        id,
+        {
+            name: req.body.name || category.name,
+            image: req.body.image|| category.image,
+            type: category.type
+            ,},{new: true,}
+    );
+res.status(200).json({ message: "Updated Successfully" });
 });
 
 exports.removeCategory = catchAsyncErrors(async (req, res, next) => {
