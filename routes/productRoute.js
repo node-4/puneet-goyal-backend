@@ -46,7 +46,7 @@ router
   .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteProduct);
 
 router.route("/product/:id").get(getProductDetails);
-router.route("/uploadExcel").post(upload.single("uploadfiles"), uploadthroughExcel);
+router.route("/uploadExcel").post(upload.single("uploadfiles"),isAuthenticatedUser, authorizeRoles("admin"), uploadthroughExcel);
 
 router.route("/review").put(isAuthenticatedUser, createProductReview);
 

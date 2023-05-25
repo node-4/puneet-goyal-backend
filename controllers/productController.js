@@ -8,7 +8,8 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ApiFeatures = require("../utils/apifeatures");
 const cloudinary = require("cloudinary");
 const { multipleFileHandle } = require("../utils/fileHandle");
-
+const xlsx = require("xlsx");
+const fs = require("fs");
 // Create Product -- Admin
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
     try {
@@ -395,22 +396,21 @@ exports.getProductByCategory = catchAsyncErrors(async (req, res, next) => {
 
 exports.uploadthroughExcel = async (req, res) => {
     try {
-        const file = req.file.originalname;
-        console.log(file);
-        const workbook = xlsx.readFile(req.file.originalname);
+        const workbook = xlsx.readFile(req.file.path);
         const sheet_name_list = workbook.SheetNames;
-        console.log(sheet_name_list);
         const data = xlsx.utils.sheet_to_json(
             workbook.Sheets[sheet_name_list[0]]
         );
-        for (let i = 0; i < data.length - 5; i++) {
-          let findCategory;
-          if (data[i].category != (null || undefined)) {
-            findCategory = await Category.findOne({ name: data[i].category });
-            if (!findCategory) {
-                response(res, ErrorCode.NOT_FOUND, {}, 'Category data not found.');
+        for (let i = 0; i < data.length; i++) {
+            let findCategory;
+            if (data[i].category != (null || undefined)) {
+                findCategory = await Category.findOne({
+                    name: data[i].category,
+                });
+                if (!findCategory) {
+                    response(res,ErrorCode.NOT_FOUND,{},"Category data not found.");
+                }
             }
-        }
             const product = new Product({
                 user: req.user.id,
                 name: data[i].name,
@@ -420,13 +420,11 @@ exports.uploadthroughExcel = async (req, res) => {
                 category: findCategory._id,
                 Stock: data[i].Stock,
             });
-            const { error } = product.validate(product);
-            if (error) {
-                throw new Error(error.details[0].message);
-            }
-            await product.save();
+            console.log(product);
+            let a = await product.save();
+            console.log("----------------",a);
         }
-        fs.unlink(file.path, (err) => {
+        fs.unlink(req.file.path, (err) => {
             if (err) throw err;
             console.log("Uploaded file deleted");
         });
