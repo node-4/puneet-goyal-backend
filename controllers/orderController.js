@@ -137,6 +137,8 @@ exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
   }
   if(req.body.paymentStatus !=(null || undefined)){
     order.paymentStatus = req.body.paymentStatus;
+  }else{
+    order.paymentStatus= order.paymentStatus;
   }
   order.status = req.body.status;
 
@@ -147,7 +149,10 @@ exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
     order.date = Date.now();
     order.delivered = req.body.delivered;
   }
-
+  if (req.body.delivered === false) {
+    order.date = Date.now();
+    order.delivered = req.body.delivered;
+  }
   await order.save({ validateBeforeSave: false });
   res.status(200).json({
     success: true,
