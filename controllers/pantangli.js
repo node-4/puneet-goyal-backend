@@ -43,16 +43,9 @@ exports.getCategory = catchAsyncErrors(async (req, res, next) => {
 
 exports.updateCategory = catchAsyncErrors(async (req, res, next) => {
     const { id } = req.params;
-    const category = await category.findById(id);
-    if (!category) new ErrorHander("Category Not Found !", 400);
-    let product = await category.findByIdAndUpdate(
-        id,
-        {
-            name: req.body.name || category.name,
-            image: req.body.image|| category.image,
-            type: category.type
-            ,},{new: true,}
-    );
+    const findCategory = await category.findById(id);
+    if (!findCategory) new ErrorHander("Category Not Found !", 400);
+    let product = await category.findByIdAndUpdate(id,{name: req.body.name || findCategory.name,image: req.body.image|| findCategory.image,type: findCategory.type,},{new: true,});
 res.status(200).json({ message: "Updated Successfully" });
 });
 
