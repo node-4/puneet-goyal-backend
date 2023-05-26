@@ -168,3 +168,16 @@ const getCartResponse = async (cart) => {
     throw error;
   }
 };
+exports.DeleteCart = async(req,res) => {
+  try{
+    const cart = await Cart.findOne({user: req.user._id});
+      const deleteCart = await Cart.findByIdAndDelete({ _id: cart._id });
+      res.status(200).json({
+          message: "Delete Cart ",
+      },)
+  }catch(err){
+      res.status(400).json({
+          message: err.message
+      })
+  }
+}
