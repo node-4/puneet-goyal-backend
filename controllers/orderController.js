@@ -344,8 +344,14 @@ exports.createTransaction = async (req, res, next) => {
         const data = await transaction.create(obj);
         if (data) {
             order.paymentGatewayOrderId = req.body.payId;
-            order.orderStatus = "confirmed";
-            await order.save();
+            if (req.body.status == "Success") {
+                order.orderStatus = "confirmed";
+                await order.save();
+                const cart = await Cart.findOne({ user: req.user._id });
+                const deleteCart = await Cart.findByIdAndDelete({
+                    _id: cart._id,
+                });
+            }
             return res.status(200).json({ msg: "order id", data: data });
         }
     } catch (error) {
