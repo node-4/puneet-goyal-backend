@@ -348,11 +348,11 @@ exports.createTransaction = async (req, res, next) => {
                 order.orderStatus = "confirmed";
                 await order.save();
                 const cart = await Cart.findOne({ user: req.user._id });
-                const deleteCart = await Cart.findByIdAndDelete({
-                    _id: cart._id,
-                });
+                const deleteCart = await Cart.findByIdAndDelete({_id: cart._id,});
+                return res.status(200).json({ msg: "order id", data: data });
+            }else {
+                return res.status(200).json({ msg: "order id", data: data });
             }
-            return res.status(200).json({ msg: "order id", data: data });
         }
     } catch (error) {
         next(error);
