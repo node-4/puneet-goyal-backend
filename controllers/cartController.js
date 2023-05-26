@@ -79,14 +79,16 @@ exports.updateQuantity = async (req, res, next) => {
 exports.getCart = async (req, res, next) => {
     try {
         const cart = await Cart.findOne({user: req.user._id});
-
-        const cartResponse = await getCartResponse(cart);
-
-        return res.status(200).json({
-            success: true,
-            msg: "cart",
-            cart: cartResponse
-        })
+        if(cart){
+          const cartResponse = await getCartResponse(cart);
+          return res.status(200).json({
+              success: true,
+              msg: "cart",
+              cart: cartResponse
+          })
+        }else{
+            next(new ErrorHander("Cart is Empty.", 404))
+        }
     } catch (error) {
         next(error);
     }
