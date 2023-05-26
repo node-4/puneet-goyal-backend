@@ -346,6 +346,7 @@ exports.createTransaction = async (req, res, next) => {
             order.paymentGatewayOrderId = req.body.payId;
             if (req.body.status == "Success") {
                 order.orderStatus = "confirmed";
+                order.paymentStatus= "paid";
                 await order.save();
                 const cart = await Cart.findOne({ user: req.user._id });
                 const deleteCart = await Cart.findByIdAndDelete({_id: cart._id,});
