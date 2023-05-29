@@ -79,7 +79,7 @@ const sendOtp = async (user, otpType) => {
       otp: otp,
       type: otpType
     });
-    //sendSMS(user.phone, `otp is ${otp}`);
+    // sendSMS(user.phone, `otp is ${otp}`);
     return otp;
   } catch (error) {
     throw error;
@@ -378,7 +378,20 @@ exports.getSingleUser = catchAsyncErrors(async (req, res, next) => {
     user,
   });
 });
+exports.getUser = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
 
+  if (!user) {
+    return next(
+      new ErrorHander(`User does not exist with Id: ${req.params.id}`)
+    );
+  }
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
 // update User Role -- Admin
 exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
   const newUserData = {

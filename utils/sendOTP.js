@@ -11,13 +11,13 @@ const client = require("twilio")(accountSid, authToken, {
 });
 
 const sendSMS = async (phone, message) => {
-  return;
   try{
     const response = await client.messages.create({
       body: message,
       from: authPhone,
       to: `=+91${phone}`,
     });
+    return response;
   }catch(error){
     console.log(error);
     throw error;
