@@ -332,16 +332,12 @@ exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
 
 // update User Profile
 exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
-req.body.image = `${process.env.IMAGE_BASE_URL}/${req.file.filename}`
- const imagesLinks = await multipleFileHandle(req.files,req);
-
 const newUserData = {
     name: req.body.name,
     email: req.body.email,
     phone: req.body.phone,
-   
+    image:req.body.image
   };
-
   const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
     new: true,
     runValidators: true,
@@ -356,7 +352,6 @@ const newUserData = {
 // Get all users(admin)
 exports.getAllUser = catchAsyncErrors(async (req, res, next) => {
   const users = await User.find();
-
   res.status(200).json({
     success: true,
     users,

@@ -49,6 +49,7 @@ const help = require('./routes/helpandsupport');
 const cat = require('./routes/pantangli')
 const wallet = require('./routes/wallet');
 const banner = require('./routes/banner')
+const offer = require('./routes/offerroute')
 
 app.use("/api/v1", product);
 app.use("/api/v1", user);
@@ -67,6 +68,7 @@ app.use('/api/v1/wallet', wallet);
 app.use('/api/v1/non-pantangli', cat);
 app.use('/api/v1/banner', banner);
 app.use('/api/v1/terms', terms);
+app.use('/api/v1/offer', offer);
 
 app.use(errorMiddleware);
 
