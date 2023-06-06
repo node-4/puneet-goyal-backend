@@ -113,7 +113,7 @@ exports.DeleteCategory = catchAsyncErrors(async (req, res, next) => {
 
 exports.TotalCategory = async (req, res) => {
     try {
-        const data = await Category.find();
+        const data = await Category.find({type: "Patanjali"});
         res.status(200).json({
             total: data.length,
         });
