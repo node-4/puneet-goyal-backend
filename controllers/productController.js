@@ -24,7 +24,7 @@ exports.createProduct = catchAsyncErrors(async (req, res, next) => {
             featureDetail: req.body.featureDetail,
             productInformation: req.body.productInformation,
             quantity: req.body.quantity,
-            discountPrice:req.body.discountPrice,
+            discountPrice: req.body.discountPrice,
             price: req.body.price,
             images: req.body.images,
             category: req.body.category,
@@ -68,7 +68,7 @@ exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
                     price: 1,
                     ratings: 1,
                     review: 1,
-                    category: "$category.parentCategory",
+                    category: "$category",
                 },
             },
         ]);
