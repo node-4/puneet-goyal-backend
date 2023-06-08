@@ -332,18 +332,9 @@ exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
 
 // update User Profile
 exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
-const newUserData = {
-    name: req.body.name,
-    email: req.body.email,
-    phone: req.body.phone,
-    image:req.body.image
-  };
-  const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  });
-
+  console.log(req.user.id);
+  const user = await User.findByIdAndUpdate({_id: req.user.id}, {$set:{name: req.body.name,email: req.body.email,phone: req.body.phone,image:req.body.image}}, {new: true,});
+  console.log(user);
   res.status(200).json({
     success: true,
   });
