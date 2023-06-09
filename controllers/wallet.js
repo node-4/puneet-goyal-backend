@@ -4,13 +4,11 @@ const Wallet = require('../models/wallet');
 
 exports.addMoney = async (req, res) => {
   if (!req.user._id) {
-    return res.status(500).json({
-      message: "Provide Token "
-    })
+    return res.status(500).json({message: "Provide Token "})
   }
   const wallet = await Wallet.findOne({ user: req.user._id });
   if (!wallet) {
-    const findWallet = await wallet.create({ user: req.user._id, balance: parseInt(req.body.balance) });
+    const findWallet = await Wallet.create({ user: req.user._id, balance: parseInt(req.body.balance) });
     res.status(200).json({ status: "success", data: findWallet });
   } else {
     wallet.balance = parseInt(wallet.balance) + parseInt(req.body.balance);
