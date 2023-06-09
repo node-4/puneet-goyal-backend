@@ -12,8 +12,11 @@ const { sendSMS, verifySMS } = require("../utils/sendOTP");
 const otpHelper = require("../utils/otp");
 const { singleFileHandle } = require("../utils/fileHandle");
 const wallet = require('../models/wallet')
-// Google O Auth
-
+cloudinary.config({
+  cloud_name: "https-www-pilkhuwahandloom-com",
+  api_key: "886273344769554",
+  api_secret: "BVicyMGE04PrE7vWSorJ5txKmPs",
+});
 exports.signInWithGoogle = catchAsyncErrors(async (req, res, next) => {
   const googleClient = new OAuth2Client({
     clientId: `${process.env.GOOGLE_CLIENT_ID}`,
@@ -39,8 +42,6 @@ exports.signInWithGoogle = catchAsyncErrors(async (req, res, next) => {
   }
   sendToken(user, 201, res);
 });
-
-// Register a User
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const { name, phone, password, role } = req.body;
   const user1 = await User.findOne({ phone: phone, role: role });
@@ -64,10 +65,6 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     }
   }
 });
-
-
-// Facebook Authentication
-
 exports.signInWithFacebook = catchAsyncErrors(async (req, res, next) => { });
 
 // Send OTP
@@ -345,7 +342,12 @@ exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
 // update User Profile
 exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
   console.log(req.user.id);
-  const user = await User.findByIdAndUpdate({ _id: req.user.id }, { $set: { name: req.body.name, email: req.body.email, phone: req.body.phone, image: req.body.image } }, { new: true, });
+  let image;
+  if (req.body.image) {
+    var result = await cloudinary.uploader.upload(req.body.image, { resource_type: "auto" });
+    image = result.secure_url;
+  }
+  const user = await User.findByIdAndUpdate({ _id: req.user.id }, {$set: {name: req.body.name,email: req.body.email,phone: req.body.phone,profile: image}}, { new: true, });
   console.log(user);
   res.status(200).json({
     success: true,
