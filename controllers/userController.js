@@ -46,11 +46,17 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const user1 = await User.findOne({ phone: phone, role: role });
   if (user1) {
     return next(new ErrorHander("Already exits!", 409));
-  }
-  const user = await User.create({ name, phone, password, role });
-  const otp = await sendOtp(user, "account_verification");
+  } else {
+    const user = await User.create({ name, phone, password, role });
+    if (user) {
+      const findWallet = await wallet.create({ user: user._id });
+      if (findWallet) {
+        const otp = await sendOtp(user, "account_verification");
+        res.status(201).json({ success: true, msg: "opt sent to your phone", otp });
+      }
 
-  res.status(201).json({ success: true, msg: "opt sent to your phone", otp });
+    }
+  }
 });
 
 
@@ -436,7 +442,7 @@ exports.AddUser = async (req, res) => {
   }
 }
 exports.resendOtp = catchAsyncErrors(async (req, res, next) => {
-  const { phone,role } = req.body;
+  const { phone, role } = req.body;
   const user = await User.findOne({ phone: phone, role: role });
   if (!user) {
     return next(new ErrorHander("user not found!", 404));
