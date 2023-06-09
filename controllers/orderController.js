@@ -346,12 +346,12 @@ exports.createTransaction = async (req, res, next) => {
             order.paymentGatewayOrderId = req.body.payId;
             if (req.body.status == "Success") {
                 order.orderStatus = "confirmed";
-                order.paymentStatus= "paid";
+                order.paymentStatus = "paid";
                 await order.save();
                 const cart = await Cart.findOne({ user: req.user._id });
-                const deleteCart = await Cart.findByIdAndDelete({_id: cart._id,});
+                const deleteCart = await Cart.findByIdAndDelete({ _id: cart._id, });
                 return res.status(200).json({ msg: "order id", data: data });
-            }else {
+            } else {
                 return res.status(200).json({ msg: "order id", data: data });
             }
         }
@@ -391,10 +391,24 @@ exports.allTransaction = async (req, res) => {
 };
 exports.allTransactionUser = async (req, res) => {
     try {
-        const data = await transaction
-            .find({ user: req.user._id })
-            .populate("user orderId");
-        res.status(200).json({ totalOrders: data.length });
+        const data = await transaction.find({ user: req.user._id }).populate("user orderId");
+        res.status(200).json({ data: data });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
+exports.allcreditTransactionUser = async (req, res) => {
+    try {
+        const data = await transaction.find({ user: req.user._id, type: "Credit" });
+        res.status(200).json({ data: data });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
+exports.allDebitTransactionUser = async (req, res) => {
+    try {
+        const data = await transaction.find({ user: req.user._id, type: "Debit" });
+        res.status(200).json({ data: data });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }

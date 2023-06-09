@@ -19,6 +19,9 @@ const transactionSchema = mongoose.Schema({
     paymentMode: {
         type: String,
     },
+    type:{
+        type: String,
+    },
     Status: {
         type: String,
     },

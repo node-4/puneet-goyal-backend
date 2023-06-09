@@ -28,5 +28,7 @@ router.post("/createTransaction/:id", isAuthenticatedUser, orderController.creat
 router.post("/admin/createTransaction/:id", isAuthenticatedUser,authorizeRoles("admin"), orderController.createTransactionbyAdmin);
 router.get("/allTransaction", orderController.allTransaction);
 router.get("/allTransactionUser", isAuthenticatedUser, orderController.allTransactionUser);
+router.get("/allcreditTransactionUser", isAuthenticatedUser, orderController.allcreditTransactionUser);
+router.get("/allDebitTransactionUser", isAuthenticatedUser, orderController.allDebitTransactionUser);
 
 module.exports = router;
