@@ -140,7 +140,7 @@ const getCartResponse = async (cart) => {
   try {
     await cart.populate([
       { path: "products.product", select: { reviews: 0 } },
-      { path: "products.product.category", select: { reviews: 0 } },
+      { path: 'products.product',populate: [{path: 'category',},]},
       { path: "coupon", select: "couponCode discount expirationDate" },
     ]);
 
