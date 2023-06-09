@@ -10,7 +10,7 @@ const cloudinary = require("cloudinary");
 const { OAuth2Client } = require("google-auth-library");
 const { sendSMS, verifySMS } = require("../utils/sendOTP");
 const otpHelper = require("../utils/otp");
-const { singleFileHandle} = require("../utils/fileHandle");
+const { singleFileHandle } = require("../utils/fileHandle");
 const wallet = require('../models/wallet')
 // Google O Auth
 
@@ -45,7 +45,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const { name, phone, password, role } = req.body;
   const user1 = await User.findOne({ phone: phone, role: role });
   if (user1) {
-      return next(new ErrorHander("Already exits!", 409));
+    return next(new ErrorHander("Already exits!", 409));
   }
   const user = await User.create({ name, phone, password, role });
   const otp = await sendOtp(user, "account_verification");
@@ -56,7 +56,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 
 // Facebook Authentication
 
-exports.signInWithFacebook = catchAsyncErrors(async (req, res, next) => {});
+exports.signInWithFacebook = catchAsyncErrors(async (req, res, next) => { });
 
 // Send OTP
 
@@ -71,8 +71,8 @@ exports.signInWithFacebook = catchAsyncErrors(async (req, res, next) => {});
 // });
 
 const sendOtp = async (user, otpType) => {
-  try{
-    await Otp.findOneAndDelete({user: user._id});
+  try {
+    await Otp.findOneAndDelete({ user: user._id });
     const otp = await otpHelper.generateOTP(5);
     await Otp.create({
       user: user._id,
@@ -93,28 +93,28 @@ exports.accountVerificationOTP = catchAsyncErrors(async (req, res, next) => {
     otp: req.body.otp
   })
 
-  console.log("user",user)
-  if(!user) {
+  console.log("user", user)
+  if (!user) {
     return next(new ErrorHander("Invalid OTP!", 400))
   }
   console.log(Date.now())
   const verify = await Otp.find({
 
     otp: req.body.otp,
-    expires: {$gt: Date.now()}
+    expires: { $gt: Date.now() }
   });
   console.log(verify)
-  if(!verify) {
+  if (!verify) {
     return next(new ErrorHander("Invalid OTP!", 401))
   }
   // user.verified = true;
   // await user.save();
-  
+
   res.status(200).json({
     message: "Verifyed"
   })
   // await Otp.findByIdAndDelete(verify._id);
-  
+
   //sendToken(verify, 201, res);
 });
 
@@ -127,7 +127,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHander("Please Enter Mobile & Password", 400));
   }
 
-  const user = await User.findOne({ phone}).select(
+  const user = await User.findOne({ phone }).select(
     "+password"
   );
 
@@ -153,7 +153,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
 
   const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "LDKFIDNADFJLD9343KJMDSO9EJL3KM", {
     expiresIn: "1d"
-});
+  });
   res.status(200).json({
     success: true,
     user,
@@ -178,10 +178,10 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
 
 // Forgot Password
 exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
-  const user = await User.findOne({phone: req.body.phone});
+  const user = await User.findOne({ phone: req.body.phone });
   let otp;
 
-  if(!user){
+  if (!user) {
     next(new ErrorHander("user with phone numebr not registered", 400))
   }
 
@@ -195,20 +195,20 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 })
 
 exports.passwordResetOtp = catchAsyncErrors(async (req, res, next) => {
-  const user = await User.findOne({phone: req.body.phone});
+  const user = await User.findOne({ phone: req.body.phone });
 
-  if(!user) {
+  if (!user) {
     return next(new ErrorHander("Invalid OTP!", 400))
   }
 
   const otpDoc = await Otp.findOne({
     user: user._id,
     otp: req.body.otp,
-    expires: {$gt: Date.now()},
+    expires: { $gt: Date.now() },
     type: "password_reset"
   });
 
-  if(!otpDoc){
+  if (!otpDoc) {
     return next(new ErrorHander("Invalid OTP!", 400));
   }
 
@@ -333,7 +333,7 @@ exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
 // update User Profile
 exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
   console.log(req.user.id);
-  const user = await User.findByIdAndUpdate({_id: req.user.id}, {$set:{name: req.body.name,email: req.body.email,phone: req.body.phone,image:req.body.image}}, {new: true,});
+  const user = await User.findByIdAndUpdate({ _id: req.user.id }, { $set: { name: req.body.name, email: req.body.email, phone: req.body.phone, image: req.body.image } }, { new: true, });
   console.log(user);
   res.status(200).json({
     success: true,
@@ -416,22 +416,31 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
 });
 
 
-exports.AddUser = async(req,res) => {
-  try{
-  const data  = {
-   first : req.body.first,
-   last: req.body.last,
-   phone: req.body.phone
-  }
-  const Data = await User.create(data) ;
-  res.status(200).json({
-    message: "User is Added By Admin",
-    user: Data
-  })
-  }catch(err){
-      console.log(err);
-      res.status(400).json({
-          message: err.message
-      })
+exports.AddUser = async (req, res) => {
+  try {
+    const data = {
+      first: req.body.first,
+      last: req.body.last,
+      phone: req.body.phone
+    }
+    const Data = await User.create(data);
+    res.status(200).json({
+      message: "User is Added By Admin",
+      user: Data
+    })
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      message: err.message
+    })
   }
 }
+exports.resendOtp = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+  const user = await User.findOne({ _id: id });
+  if (user) {
+    return next(new ErrorHander("user not found!", 404));
+  }
+  const otp = await sendOtp(user, "account_verification");
+  res.status(201).json({ success: true, msg: "opt sent to your phone", otp });
+});
