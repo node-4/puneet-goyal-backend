@@ -1,5 +1,5 @@
 const express = require("express");
-const { registerUser, loginUser, logout, forgotPassword, resendOtp,resetPassword, getUserDetails, getUser, updatePassword, updateProfile, getAllUser, getSingleUser, updateUserRole, deleteUser, signInWithGoogle, accountVerificationOTP, passwordResetOtp, AddUser,} = require("../controllers/userController");
+const { registerUser, loginUser, logout, forgotPassword, resendOtp, resetPassword, getUserDetails, getUser, updatePassword, updateProfile, getAllUser, getSingleUser, updateUserRole, deleteUser, signInWithGoogle, accountVerificationOTP, passwordResetOtp, AddUser, } = require("../controllers/userController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 const { otpLimiter } = require("../middleware/rateLimiter");
 const upload = require("../middleware/fileUpload");
@@ -11,7 +11,7 @@ const router = express.Router();
 router.route("/verifyRegistration").post(accountVerificationOTP);
 
 router.route("/googleAuth").post(signInWithGoogle);
-router.route("/resendOtp/:id").post(resendOtp);
+router.route("/resendOtp/:phone/:role").post(resendOtp);
 
 router.route("/register").post(registerUser);
 
