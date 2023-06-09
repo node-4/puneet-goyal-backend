@@ -10,12 +10,23 @@ const cloudinary = require("cloudinary");
 const { multipleFileHandle } = require("../utils/fileHandle");
 const xlsx = require("xlsx");
 const fs = require("fs");
+cloudinary.config({
+    cloud_name: "https-www-pilkhuwahandloom-com",
+    api_key: "886273344769554",
+    api_secret: "BVicyMGE04PrE7vWSorJ5txKmPs",
+});
 // Create Product -- Admin
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
     try {
-        // const imagesLinks = await multipleFileHandle(req.files,req);
+        let images = []
+        if (req.body.images) {
+            for (let i = 0; i < req.body.images.length; i++) {
+                var result = await cloudinary.uploader.upload(req.body.images[i], { resource_type: "auto" });
+                let image = result.secure_url;
+                images.push(image)
 
-        // req.body.images = imagesLinks;
+            }
+        }
         req.body.user = req.user.id;
         const data = {
             user: req.user.id,
@@ -24,9 +35,10 @@ exports.createProduct = catchAsyncErrors(async (req, res, next) => {
             featureDetail: req.body.featureDetail,
             productInformation: req.body.productInformation,
             quantity: req.body.quantity,
+            brand: req.body.brand,
             discountPrice: req.body.discountPrice,
             price: req.body.price,
-            images: req.body.images,
+            images: images,
             category: req.body.category,
             Stock: req.body.Stock,
         };
@@ -149,11 +161,16 @@ exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
         if (!product) {
             return next(new ErrorHander("Product not found", 404));
         }
-        let images = [];
+        let images = []
         if (req.body.images) {
-            images.push(req.body.images);
+            for (let i = 0; i < req.body.images.length; i++) {
+                var result = await cloudinary.uploader.upload(req.body.images[i], { resource_type: "auto" });
+                let image = result.secure_url;
+                images.push(image)
+
+            }
         } else {
-            images = req.body.images;
+            images = product.images;
         }
         product = await Product.findByIdAndUpdate(
             req.params.id,
@@ -162,11 +179,12 @@ exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
                 description: req.body.description || product.description,
                 price: req.body.price || product.price,
                 featureDetail: req.body.featureDetail || product.featureDetail,
+                brand: req.body.brand || product.brand,
                 productInformation: req.body.productInformation || product.productInformation,
                 discountPrice: req.body.discountPrice || product.discountPrice,
                 quantity: req.body.quantity || product.quantity,
                 category: req.body.category || product.category,
-                images: req.body.images || product.images,
+                images: images,
                 ratings: req.body.ratings || product.ratings,
                 Stock: req.body.Stock || product.Stock,
             },
