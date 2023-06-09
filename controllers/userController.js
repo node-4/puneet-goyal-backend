@@ -45,7 +45,13 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const { name, phone, password, role } = req.body;
   const user1 = await User.findOne({ phone: phone, role: role });
   if (user1) {
-    return next(new ErrorHander("Already exits!", 409));
+    const findWallet = await wallet.findOne({ user: user1._id });
+    if (findWallet) {
+      return next(new ErrorHander("Already exits!", 409));
+    } else {
+      const findWallet = await wallet.create({ user: user1._id });
+      return next(new ErrorHander("Already exits!", 409));
+    }
   } else {
     const user = await User.create({ name, phone, password, role });
     if (user) {
