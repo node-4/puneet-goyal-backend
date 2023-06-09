@@ -436,7 +436,7 @@ exports.AddUser = async (req, res) => {
   }
 }
 exports.resendOtp = catchAsyncErrors(async (req, res, next) => {
-  const { phone,role } = req.params;
+  const { phone,role } = req.body;
   const user = await User.findOne({ phone: phone, role: role });
   if (user) {
     return next(new ErrorHander("user not found!", 404));

@@ -11,7 +11,7 @@ const router = express.Router();
 router.route("/verifyRegistration").post(accountVerificationOTP);
 
 router.route("/googleAuth").post(signInWithGoogle);
-router.route("/resendOtp/:phone/:role").post(resendOtp);
+router.route("/resendOtp").post(resendOtp);
 
 router.route("/register").post(registerUser);
 
