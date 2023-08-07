@@ -6,8 +6,8 @@ const moment = require("moment")
 
 exports.addToCart = async (req, res, next) => {
   try {
-    const  product  = req.params.id;
-    const productData = await Product.findById({_id: product})
+    const product = req.params.id;
+    const productData = await Product.findById({ _id: product })
     console.log(productData)
     let cart = await Cart.findOne({
       user: req.user._id,
@@ -23,7 +23,7 @@ exports.addToCart = async (req, res, next) => {
     });
 
     if (productIndex < 0) {
-      cart.products.push({ product, productName , price});
+      cart.products.push({ product, productName, price });
     } else {
       cart.products[productIndex].quantity++;
     }
@@ -77,53 +77,53 @@ exports.updateQuantity = async (req, res, next) => {
 };
 
 exports.getCart = async (req, res, next) => {
-    try {
-        const cart = await Cart.findOne({user: req.user._id});
-        if(cart){
-          const cartResponse = await getCartResponse(cart);
-          return res.status(200).json({
-              success: true,
-              msg: "cart",
-              cart: cartResponse
-          })
-        }else{
-            next(new ErrorHander("Cart is Empty.", 404))
-        }
-    } catch (error) {
-        next(error);
+  try {
+    const cart = await Cart.findOne({ user: req.user._id });
+    if (cart) {
+      const cartResponse = await getCartResponse(cart);
+      return res.status(200).json({
+        success: true,
+        msg: "cart",
+        cart: cartResponse
+      })
+    } else {
+      next(new ErrorHander("Cart is Empty.", 404))
     }
+  } catch (error) {
+    next(error);
+  }
 }
 
 exports.applyCoupon = async (req, res, next) => {
-    try {
-        const cart = await Cart.findOne({user: req.user._id});
+  try {
+    const cart = await Cart.findOne({ user: req.user._id });
 
-        const coupon = await Coupon.findOne({
-            couponCode: req.body.couponCode,
-            expirationDate: {$gte: new Date(moment().format("YYYY-MM-DD"))},
-            activationDate: {$lte: new Date(moment().format("YYYY-MM-DD"))}
-        })
-        console.log("coupon",coupon)
-        console.log("cartCoupon",cart)
+    const coupon = await Coupon.findOne({
+      couponCode: req.body.couponCode,
+      expirationDate: { $gte: new Date(moment().format("YYYY-MM-DD")) },
+      activationDate: { $lte: new Date(moment().format("YYYY-MM-DD")) }
+    })
+    console.log("coupon", coupon)
+    console.log("cartCoupon", cart)
 
-        if(!coupon){
-            next(new ErrorHander("invalid coupon code", 400))
-        }
-   
-        cart.coupon = coupon._id;
-
-        await cart.save();
-
-        return res.status(200).json({
-            success: true,
-            msg: "coupon applied successfully"
-        })
-     
-    } catch (error) {
-        console.log(error);
-        next(error);
-       
+    if (!coupon) {
+      next(new ErrorHander("invalid coupon code", 400))
     }
+
+    cart.coupon = coupon._id;
+
+    await cart.save();
+
+    return res.status(200).json({
+      success: true,
+      msg: "coupon applied successfully"
+    })
+
+  } catch (error) {
+    console.log(error);
+    next(error);
+
+  }
 }
 
 const createCart = async (userId) => {
@@ -138,10 +138,9 @@ const createCart = async (userId) => {
 
 const getCartResponse = async (cart) => {
   try {
-    console.log(cart);
     await cart.populate([
       { path: "products.product", select: { reviews: 0 } },
-      { path: 'products.product',populate: [{path: 'category',},]},
+      { path: 'products.product', populate: [{ path: 'category', },] },
       { path: "coupon", select: "couponCode discount expirationDate" },
     ]);
 
@@ -150,7 +149,7 @@ const getCartResponse = async (cart) => {
       cart.save();
     }
     const cartResponse = cart.toObject();
-
+    // 
     let discount = 0;
     let total = 0;
     cartResponse.products.forEach((cartProduct) => {
@@ -172,16 +171,16 @@ const getCartResponse = async (cart) => {
     throw error;
   }
 };
-exports.DeleteCart = async(req,res) => {
-  try{
-    const cart = await Cart.findOne({user: req.user._id});
-      const deleteCart = await Cart.findByIdAndDelete({ _id: cart._id });
-      res.status(200).json({
-          message: "Delete Cart ",
-      },)
-  }catch(err){
-      res.status(400).json({
-          message: err.message
-      })
+exports.DeleteCart = async (req, res) => {
+  try {
+    const cart = await Cart.findOne({ user: req.user._id });
+    const deleteCart = await Cart.findByIdAndDelete({ _id: cart._id });
+    res.status(200).json({
+      message: "Delete Cart ",
+    },)
+  } catch (err) {
+    res.status(400).json({
+      message: err.message
+    })
   }
 }
