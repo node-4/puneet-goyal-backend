@@ -138,6 +138,7 @@ const createCart = async (userId) => {
 
 const getCartResponse = async (cart) => {
   try {
+    console.log(cart);
     await cart.populate([
       { path: "products.product", select: { reviews: 0 } },
       { path: 'products.product',populate: [{path: 'category',},]},
@@ -153,7 +154,7 @@ const getCartResponse = async (cart) => {
     let discount = 0;
     let total = 0;
     cartResponse.products.forEach((cartProduct) => {
-      cartProduct.total = cartProduct.product.price * cartProduct.quantity;
+      cartProduct.total = cartProduct.price * cartProduct.quantity;
       total += cartProduct.total;
     });
 
